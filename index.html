@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sticky Notes</title>
+    <style>
+        body {
+            background: linear-gradient(to right, #00c6ff, #0072ff);
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 70px;
+            text-align: center;
+            color: white;
+            margin-top: 20px;
+        }
+        .new {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            border: 6px solid yellow;
+            border-radius: 50%;
+            text-align: center;
+            background-color: yellow;
+            font-size: 60px;
+            line-height: 70px;
+            cursor: pointer;
+            transition: box-shadow 0.3s;
+        }
+        .new:hover {
+            box-shadow: 0 0 30px yellow;
+        }
+        .note {
+            width: 90%;
+            max-width: 500px;
+            margin: 20px auto;
+            background-color: whitesmoke;
+            border-radius: 15px;
+            padding: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 18px;
+            position: relative;
+        }
+        .note p {
+            margin: 0;
+            padding: 10px;
+            min-height: 60px;
+            overflow: auto;
+        }
+        .note button {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            line-height: 25px;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>📒 Notes</h1>
+    <div id="notes-container"></div>
+    <div class="new" onclick="createNote()">+</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', loadNotes);
+
+        function createNote() {
+            const notesContainer = document.getElementById('notes-container');
+            const note = document.createElement('div');
+            note.className = 'note';
+            note.innerHTML = `
+                <p contenteditable="true" oninput="saveNotes()" onclick="textContent=''">New note...</p>
+                <button onclick="deleteNote(this)">x</button>
+            `;
+            notesContainer.appendChild(note);
+            saveNotes();
+        }
+
+        function deleteNote(button) {
+            const note = button.parentElement;
+            note.remove();
+            saveNotes();
+        }
+
+        function saveNotes() {
+            const notes = [];
+            document.querySelectorAll('.note p').forEach(note => {
+                notes.push(note.innerHTML);
+            });
+            localStorage.setItem('notes', JSON.stringify(notes));
+        }
+
+        function loadNotes() {
+            const savedNotes = JSON.parse(localStorage.getItem('notes'));
+            if (savedNotes) {
+                const notesContainer = document.getElementById('notes-container');
+                savedNotes.forEach(noteContent => {
+                    const note = document.createElement('div');
+                    note.className = 'note';
+                    note.innerHTML = `
+                        <p contenteditable="true" oninput="saveNotes()">${noteContent}</p>
+                        <button onclick="deleteNote(this)">x</button>
+                    `;
+                    notesContainer.appendChild(note);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
